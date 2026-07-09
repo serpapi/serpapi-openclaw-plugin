@@ -120,7 +120,7 @@ export function createSerpApiHotelsTool(api: OpenClawPluginApi, ctx?: SerpApiToo
       const checkOut = rawCheckOut
         ? parseIsoDate(rawCheckOut, "check_out_date")
         : isoDateOffsetFrom(checkIn, 2);
-      if (rawCheckIn && rawCheckOut && checkOut <= checkIn) {
+      if (checkOut <= checkIn) {
         throw new Error("serpapi_hotels: check_out_date must be after check_in_date");
       }
       const raw = await callSerpApi({
