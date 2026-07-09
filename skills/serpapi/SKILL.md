@@ -9,13 +9,15 @@ metadata:
 
 ## Configuration
 
-Set your API key and optional default language under `config.webSearch`:
+Set your API key and optional default language under `config.webSearch`. The
+plugin must also be enabled via `plugins.entries.serpapi.enabled`:
 
 ```json
 {
   "plugins": {
     "entries": {
       "serpapi": {
+        "enabled": true,
         "config": {
           "webSearch": {
             "apiKey": "your-serpapi-key",
