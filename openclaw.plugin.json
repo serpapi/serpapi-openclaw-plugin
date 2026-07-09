@@ -1,0 +1,53 @@
+{
+  "id": "serpapi",
+  "name": "SerpApi Search",
+  "description": "Web search provider backed by SerpApi (Google Light, with 100+ engines). Specialized SerpApi tools follow in subsequent releases.",
+  "activation": {
+    "onStartup": false
+  },
+  "skills": ["./skills"],
+  "setup": {
+    "providers": [
+      {
+        "id": "serpapi",
+        "authMethods": ["api-key"],
+        "envVars": ["SERPAPI_API_KEY"]
+      }
+    ]
+  },
+  "uiHints": {
+    "webSearch.apiKey": {
+      "label": "SerpApi API Key",
+      "help": "SerpApi API key for all search engines (fallback: SERPAPI_API_KEY env var).",
+      "sensitive": true,
+      "placeholder": "..."
+    },
+    "webSearch.hl": {
+      "label": "Default Language",
+      "help": "Default language code for all searches (e.g. en, de, uk). Defaults to en."
+    }
+  },
+  "contracts": {
+    "webSearchProviders": ["serpapi"],
+    "tools": []
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "webSearch": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "type": ["string", "object"]
+          },
+          "hl": {
+            "type": "string",
+            "description": "Default language code for all searches (e.g. en, de, ja). Defaults to en."
+          }
+        }
+      }
+    }
+  }
+}
