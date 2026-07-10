@@ -130,8 +130,8 @@ export function createSerpApiEbayTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
           category_id: categoryId ?? undefined,
           LH_ItemCondition: readStringParam(args, "condition") ?? undefined,
           _stpos: readStringParam(args, "zip") ?? undefined,
-          _pgn: readNumberParam(args, "page", { integer: true }) ?? undefined,
-          _ipg: readNumberParam(args, "per_page", { integer: true }) ?? undefined,
+          _pgn: readNumberParam(args, "page", { integer: true }) ?? 1,
+          _ipg: readNumberParam(args, "per_page", { integer: true }) ?? 50,
         },
         signal,
       });

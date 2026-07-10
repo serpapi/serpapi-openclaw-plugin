@@ -109,6 +109,7 @@ export function createSerpApiDuckDuckGoTool(api: OpenClawPluginApi, ctx?: SerpAp
       if (searchAssist === true && m != null) {
         throw new Error("serpapi_duckduckgo: search_assist and m are mutually exclusive");
       }
+      const resolvedM = searchAssist === true ? undefined : (m ?? 50);
       const raw = await callSerpApi({
         cfg,
         engine: "duckduckgo",
@@ -118,7 +119,7 @@ export function createSerpApiDuckDuckGoTool(api: OpenClawPluginApi, ctx?: SerpAp
           kl: readStringParam(args, "kl") ?? undefined,
           safe: readNumberParam(args, "safe", { integer: true }) ?? undefined,
           df: readStringParam(args, "df") ?? undefined,
-          m: m ?? undefined,
+          m: resolvedM,
           start: readNumberParam(args, "start", { integer: true }) ?? undefined,
           search_assist: searchAssistParam,
         },

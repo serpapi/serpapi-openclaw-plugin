@@ -115,6 +115,11 @@ Search Google Scholar for academic papers.
 
 Results include `inline_links.cited_by.total` (citation count) and `result_id` for follow-up `cites`/`cluster` calls.
 
+### Tips
+
+- At least one of `query`, `cites`, or `cluster` is required.
+- `cluster` cannot be combined with `query` or `cites`.
+
 ## serpapi_maps
 
 Find local businesses and places via Google Maps.
@@ -145,7 +150,7 @@ Search Amazon for products across any marketplace.
 | `query`         | Product search query                                                                                      |
 | `amazon_domain` | Marketplace domain (e.g. `amazon.com`, `amazon.de`, `amazon.co.uk`, `amazon.co.jp`)                       |
 | `language`      | Locale code (e.g. `en_US`, `de_DE`, `ja_JP`)                                                              |
-| `s`             | Sort: `price-asc-rank`, `price-desc-rank`, `review-rank`, `date-desc-rank`, `exact-aware-popularity-rank` |
+| `s`             | Sort: `relevanceblender`=Featured (default), `price-asc-rank`, `price-desc-rank`, `review-rank`, `date-desc-rank`, `exact-aware-popularity-rank` |
 | `node`          | Category node ID (from Amazon URL or `filters[].node` in a previous response)                             |
 | `rh`            | Attribute filter string from `filters[].rh` in a previous response                                        |
 | `page`          | Page number for pagination (default: 1)                                                                   |
@@ -282,7 +287,7 @@ Look up stock prices, cryptocurrency, FX rates, and market data via Google Finan
 
 | Parameter | Description                                                             |
 | --------- | ----------------------------------------------------------------------- |
-| `query`   | Ticker or pair (e.g. `AAPL`, `BTC-USD`, `EUR-USD`, `NASDAQ:GOOGL`)      |
+| `query`   | Ticker or pair (e.g. `AAPL`, `BTC-USD`, `USDEUR=X`, `NASDAQ:GOOGL`)      |
 | `window`  | Time window: `1D` (default), `5D`, `1M`, `6M`, `YTD`, `1Y`, `5Y`, `MAX` |
 
 Response includes `summary` (price, movement, exchange), `markets` (US/Europe/Asia indices, currencies, crypto), `graph` (price history points), `knowledge_graph` (key stats), `financials` (income statement), `news_results`, and `discover_more`.

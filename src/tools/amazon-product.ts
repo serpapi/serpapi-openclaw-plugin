@@ -84,7 +84,7 @@ export function createSerpApiAmazonProductTool(api: OpenClawPluginApi, ctx?: Ser
         allowedParams: ALLOWED_PARAMS,
         params: {
           asin: readStringParam(args, "asin", { required: true }),
-          amazon_domain: readStringParam(args, "amazon_domain") ?? undefined,
+          amazon_domain: readStringParam(args, "amazon_domain") ?? "amazon.com",
           language: readStringParam(args, "language") ?? undefined,
           delivery_zip: readStringParam(args, "delivery_zip") ?? undefined,
           shipping_location: readStringParam(args, "shipping_location") ?? undefined,

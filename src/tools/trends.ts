@@ -93,9 +93,9 @@ export function createSerpApiTrendsTool(api: OpenClawPluginApi, ctx?: SerpApiToo
           date: readStringParam(args, "date") ?? "today 12-m",
           geo: readStringParam(args, "geo") ?? undefined,
           region: readStringParam(args, "region") ?? undefined,
-          cat: readNumberParam(args, "cat", { integer: true }) ?? undefined,
+          cat: readNumberParam(args, "cat", { integer: true }) ?? 0,
           gprop: readStringParam(args, "gprop") ?? undefined,
-          tz: readNumberParam(args, "tz", { integer: true }) ?? undefined,
+          tz: readNumberParam(args, "tz", { integer: true }) ?? 420,
         },
         signal,
       });

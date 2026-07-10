@@ -108,7 +108,7 @@ export function createSerpApiWalmartTool(api: OpenClawPluginApi, ctx?: SerpApiTo
           store_id: readStringParam(args, "store_id") ?? undefined,
           min_price: readNumberParam(args, "min_price") ?? undefined,
           max_price: readNumberParam(args, "max_price") ?? undefined,
-          page: readNumberParam(args, "page", { integer: true }) ?? undefined,
+          page: readNumberParam(args, "page", { integer: true }) ?? 1,
         },
         signal,
       });

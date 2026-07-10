@@ -91,7 +91,7 @@ export function createSerpApiTripadvisorTool(api: OpenClawPluginApi, ctx?: SerpA
           tripadvisor_domain: readStringParam(args, "tripadvisor_domain") ?? undefined,
           lat: readNumberParam(args, "lat") ?? undefined,
           lon: readNumberParam(args, "lon") ?? undefined,
-          limit: readNumberParam(args, "limit", { integer: true }) ?? undefined,
+          limit: readNumberParam(args, "limit", { integer: true }) ?? 30,
           offset: readNumberParam(args, "offset", { integer: true }) ?? undefined,
         },
         signal,

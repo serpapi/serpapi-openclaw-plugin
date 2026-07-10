@@ -52,6 +52,7 @@ export function createSerpApiAmazonTool(api: OpenClawPluginApi, ctx?: SerpApiToo
           type: "string",
           enum: [
             "relevanceblender",
+            "relevanceblender",
             "price-asc-rank",
             "price-desc-rank",
             "review-rank",
@@ -91,7 +92,7 @@ export function createSerpApiAmazonTool(api: OpenClawPluginApi, ctx?: SerpApiToo
           s: readStringParam(args, "s") ?? undefined,
           node: readStringParam(args, "node") ?? undefined,
           rh: readStringParam(args, "rh") ?? undefined,
-          page: readNumberParam(args, "page", { integer: true }) ?? undefined,
+          page: readNumberParam(args, "page", { integer: true }) ?? 1,
         },
         signal,
       });

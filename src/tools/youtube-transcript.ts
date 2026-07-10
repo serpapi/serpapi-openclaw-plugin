@@ -58,7 +58,7 @@ export function createSerpApiYouTubeTranscriptTool(api: OpenClawPluginApi, ctx?:
         allowedParams: ALLOWED_PARAMS,
         params: {
           v: readStringParam(args, "v", { required: true }),
-          language_code: readStringParam(args, "language_code") ?? undefined,
+          language_code: readStringParam(args, "language_code") ?? "en",
           title: readStringParam(args, "title") ?? undefined,
           type: readStringParam(args, "type") ?? undefined,
         },

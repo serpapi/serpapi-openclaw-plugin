@@ -105,7 +105,7 @@ export function createSerpApiYahooTool(api: OpenClawPluginApi, ctx?: SerpApiTool
           vm: readStringParam(args, "vm") ?? undefined,
           vs: readStringParam(args, "vs") ?? undefined,
           vf: readStringParam(args, "vf") ?? undefined,
-          b: readNumberParam(args, "b", { integer: true }) ?? undefined,
+          b: readNumberParam(args, "b", { integer: true }) ?? 1,
         },
         signal,
       });
