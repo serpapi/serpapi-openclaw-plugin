@@ -63,6 +63,14 @@ export function createSerpApiFlightsTool(api: OpenClawPluginApi, ctx?: SerpApiTo
     },
     execute: async (_toolCallId: string, args: Record<string, unknown>, signal?: AbortSignal) => {
       const cfg = resolveToolConfig(api, ctx);
+      const type = readStringParam(args, "type") ?? "1";
+      const returnDate = readStringParam(args, "return_date") ?? undefined;
+      if (type === "1" && !returnDate) {
+        throw new Error(
+          "serpapi_flights: return_date is required for round-trip searches (type=1). " +
+            "Provide return_date or set type=2 for a one-way search.",
+        );
+      }
       const raw = await callSerpApi({
         cfg,
         engine: "google_flights",
@@ -71,10 +79,10 @@ export function createSerpApiFlightsTool(api: OpenClawPluginApi, ctx?: SerpApiTo
           departure_id: readStringParam(args, "departure_id", { required: true }),
           arrival_id: readStringParam(args, "arrival_id", { required: true }),
           outbound_date: readStringParam(args, "outbound_date", { required: true }),
-          return_date: readStringParam(args, "return_date") ?? undefined,
-          type: readStringParam(args, "type") ?? undefined,
-          adults: readNumberParam(args, "adults", { integer: true }) ?? undefined,
-          currency: readStringParam(args, "currency") ?? undefined,
+          return_date: returnDate,
+          type,
+          adults: readNumberParam(args, "adults", { integer: true }) ?? 1,
+          currency: readStringParam(args, "currency") ?? "USD",
           gl: readStringParam(args, "gl") ?? undefined,
         },
         signal,

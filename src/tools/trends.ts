@@ -63,7 +63,7 @@ export function createSerpApiTrendsTool(api: OpenClawPluginApi, ctx?: SerpApiToo
           description: "Region breakdown level for GEO_MAP/GEO_MAP_0 data types.",
         },
         cat: {
-          type: "string",
+          type: "number",
           description: "Search category ID (default: 0 = all categories).",
         },
         gprop: {
@@ -93,7 +93,7 @@ export function createSerpApiTrendsTool(api: OpenClawPluginApi, ctx?: SerpApiToo
           date: readStringParam(args, "date") ?? "today 12-m",
           geo: readStringParam(args, "geo") ?? undefined,
           region: readStringParam(args, "region") ?? undefined,
-          cat: readStringParam(args, "cat") ?? undefined,
+          cat: readNumberParam(args, "cat", { integer: true }) ?? undefined,
           gprop: readStringParam(args, "gprop") ?? undefined,
           tz: readNumberParam(args, "tz", { integer: true }) ?? undefined,
         },

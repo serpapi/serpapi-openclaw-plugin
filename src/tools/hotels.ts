@@ -131,7 +131,7 @@ export function createSerpApiHotelsTool(api: OpenClawPluginApi, ctx?: SerpApiToo
           q: readStringParam(args, "query", { required: true }),
           check_in_date: checkIn,
           check_out_date: checkOut,
-          adults: readNumberParam(args, "adults", { integer: true }) ?? undefined,
+          adults: readNumberParam(args, "adults", { integer: true }) ?? 1,
           currency: readStringParam(args, "currency") ?? undefined,
           gl: readStringParam(args, "gl") ?? undefined,
           sort_by: readNumberParam(args, "sort_by", { integer: true }) ?? undefined,
