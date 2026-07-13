@@ -34,7 +34,7 @@ function extract(raw: Record<string, unknown>): Record<string, unknown> {
   return {
     engine: "yahoo",
     results: organicResults,
-    related_searches: raw.related_searches ?? null,
+    related_searches: raw.related_searches ?? [],
     serpapi_pagination: raw.serpapi_pagination ?? null,
   };
 }
