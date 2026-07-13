@@ -97,7 +97,7 @@ export function createSerpApiBingTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
           mkt: mkt ?? undefined,
           cc: cc ?? undefined,
           location: readStringParam(args, "location") ?? undefined,
-          safeSearch: readStringParam(args, "safeSearch") ?? undefined,
+          safeSearch: readStringParam(args, "safeSearch") ?? "Moderate",
           first: readNumberParam(args, "first", { integer: true }) ?? 1,
         },
         signal,

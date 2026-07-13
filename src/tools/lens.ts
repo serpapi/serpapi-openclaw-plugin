@@ -82,7 +82,7 @@ export function createSerpApiLensTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
         allowedParams: ALLOWED_PARAMS,
         params: {
           url: readStringParam(args, "url", { required: true }),
-          type: readStringParam(args, "type") ?? undefined,
+          type: readStringParam(args, "type") ?? "all",
           q: readStringParam(args, "q") ?? undefined,
           hl: readStringParam(args, "hl") ?? undefined,
           country: readStringParam(args, "country") ?? undefined,
