@@ -26,14 +26,17 @@ export function createSerpApiFinanceTool(api: OpenClawPluginApi, ctx?: SerpApiTo
     description:
       "Look up stock prices, currency rates, and cryptocurrency via Google Finance. " +
       "Returns price, change, and recent news. " +
-      "Examples: q='AAPL' (Apple stock), q='BTC-USD' (Bitcoin), q='USDEUR=X' (USD/EUR rate). " +
+      "Examples: q='GOOGL:NASDAQ' (Alphabet stock), q='BTC-USD' (Bitcoin), q='USDEUR=X' (USD/EUR rate). " +
+      "Stocks use symbol-first, exchange-qualified form: TICKER:EXCHANGE (e.g. GOOGL:NASDAQ, AAPL:NASDAQ). " +
       "window: 1D, 5D, 1M, 6M, YTD, 1Y, 5Y, MAX.",
     parameters: {
       type: "object",
       properties: {
         query: {
           type: "string",
-          description: "Ticker or pair (e.g. AAPL, BTC-USD, USDEUR=X, NASDAQ:GOOGL).",
+          description:
+            "Ticker or pair. Stocks use symbol-first, exchange-qualified form TICKER:EXCHANGE " +
+            "(e.g. GOOGL:NASDAQ). Also supports crypto (BTC-USD) and FX pairs (USDEUR=X).",
         },
         window: {
           type: "string",
