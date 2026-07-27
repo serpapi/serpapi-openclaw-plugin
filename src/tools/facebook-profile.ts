@@ -7,13 +7,12 @@ import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
 const ALLOWED_PARAMS = ["profile_id", "zero_trace"] as const;
 
 function extract(raw: Record<string, unknown>): Record<string, unknown> {
+  const profileResults = (raw.profile_results ?? null) as Record<string, unknown> | null;
+  const { photos, ...profile } = profileResults ?? {};
   return {
     engine: "facebook_profile",
-    profile: raw.profile ?? null,
-    posts: raw.posts ?? [],
-    photos: raw.photos ?? [],
-    videos: raw.videos ?? [],
-    about: raw.about ?? null,
+    profile: profileResults ? profile : null,
+    photos: photos ?? [],
   };
 }
 
@@ -23,7 +22,7 @@ export function createSerpApiFacebookProfileTool(api: OpenClawPluginApi, ctx?: S
     label: "SerpApi Facebook Profile",
     description:
       "Fetch a public Facebook profile via SerpApi. " +
-      "Returns profile info, posts, photos, videos, and about section. " +
+      "Returns profile details and photos. " +
       "Use the profile slug (e.g. Meta) or numeric ID from the profile URL.",
     parameters: {
       type: "object",
