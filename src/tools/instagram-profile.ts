@@ -7,13 +7,12 @@ import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
 const ALLOWED_PARAMS = ["profile_id", "next_page_token", "zero_trace"] as const;
 
 function extract(raw: Record<string, unknown>): Record<string, unknown> {
+  const profileResults = (raw.profile_results ?? null) as Record<string, unknown> | null;
+  const { posts, ...profile } = profileResults ?? {};
   return {
     engine: "instagram_profile",
-    profile: raw.profile_data ?? raw.profile ?? null,
-    posts: raw.posts ?? raw.recent_posts ?? [],
-    reels: raw.reels ?? [],
-    highlights: raw.highlights ?? [],
-    related_profiles: raw.related_profiles ?? [],
+    profile: profileResults ? profile : null,
+    posts: posts ?? [],
     serpapi_pagination: raw.serpapi_pagination ?? null,
   };
 }
@@ -24,7 +23,7 @@ export function createSerpApiInstagramProfileTool(api: OpenClawPluginApi, ctx?: 
     label: "SerpApi Instagram Profile",
     description:
       "Fetch a public Instagram profile via SerpApi. " +
-      "Returns profile details, posts, reels, highlights, and related profiles. " +
+      "Returns profile details and posts. " +
       "Use next_page_token from serpapi_pagination to paginate posts.",
     parameters: {
       type: "object",
