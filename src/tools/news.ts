@@ -40,7 +40,8 @@ export function createSerpApiNewsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
     description:
       "Search Google News for recent articles. Returns headlines, sources, dates, and URLs. " +
       "Use topic_token/publication_token for browsing topics or publishers. " +
-      "so: 0=relevance (default), 1=date. Time filter via q: e.g. q='coffee when:1d'.",
+      "so: 0=relevance (default), 1=date; cannot be combined with query (use 'when:' in query for date filtering instead). " +
+      "Time filter via q: e.g. q='coffee when:1d'.",
     parameters: {
       type: "object",
       properties: {
@@ -58,7 +59,7 @@ export function createSerpApiNewsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
         hl: { type: "string", description: "Language code override (e.g. en, de, uk)." },
         so: {
           type: "number",
-          description: "Sort: 0=relevance (default), 1=date.",
+          description: "Sort: 0=relevance (default), 1=date. Cannot be combined with query.",
           enum: [0, 1],
         },
         topic_token: {
@@ -94,6 +95,12 @@ export function createSerpApiNewsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
       }
       const cfg = resolveToolConfig(api, ctx);
       const count = readNumberParam(args, "count", { integer: true }) ?? 5;
+      const so = readNumberParam(args, "so", { integer: true }) ?? undefined;
+      if (query && so !== undefined) {
+        throw new Error(
+          "serpapi_news: 'so' (sort) cannot be combined with 'query'. Use 'when:' in the query for date filtering (e.g. 'AI when:7d'), or omit 'query' when using 'so'.",
+        );
+      }
       const raw = await callSerpApi({
         cfg,
         engine: "google_news",
@@ -102,7 +109,7 @@ export function createSerpApiNewsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
           q: query ?? undefined,
           gl: readStringParam(args, "gl") ?? undefined,
           hl: readStringParam(args, "hl") ?? undefined,
-          so: readNumberParam(args, "so", { integer: true }) ?? undefined,
+          so,
           topic_token: topicToken ?? undefined,
           publication_token: publicationToken ?? undefined,
           section_token: sectionToken ?? undefined,

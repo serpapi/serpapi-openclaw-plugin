@@ -14,6 +14,7 @@ const ALLOWED_PARAMS = [
   "hl",
   "ll",
   "location",
+  "z",
   "type",
   "nearby",
   "start",
@@ -37,7 +38,8 @@ export function createSerpApiMapsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
     label: "SerpApi Google Maps",
     description:
       "Find local businesses, restaurants, services, and points of interest via Google Maps. " +
-      "Returns name, address, rating, reviews, hours. Use ll for GPS precision: @lat,lng,zoom.",
+      "Returns name, address, rating, reviews, hours. Prefer ll for GPS precision: @lat,lng,zoom. " +
+      "When using location (a text area), a zoom level is required; the tool applies z=14 by default.",
     parameters: {
       type: "object",
       properties: {
@@ -46,7 +48,17 @@ export function createSerpApiMapsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
           type: "string",
           description: 'GPS coordinates @lat,lng,zoom (e.g. "@40.7128,-74.006,14z").',
         },
-        location: { type: "string", description: "City or area string (e.g. 'Austin, Texas')." },
+        location: {
+          type: "string",
+          description:
+            "City or area string (e.g. 'Austin, Texas'). Requires a zoom level; z defaults to 14.",
+        },
+        z: {
+          type: "number",
+          description: "Zoom level 3-21 (default 14). Used with location.",
+          minimum: 3,
+          maximum: 21,
+        },
         count: {
           type: "number",
           description: "Number of results (1-20).",
@@ -69,6 +81,12 @@ export function createSerpApiMapsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
       const count = readNumberParam(args, "count", { integer: true }) ?? 5;
       const ll = readStringParam(args, "ll");
       const location = readStringParam(args, "location");
+      // SerpApi Google Maps requires a zoom (z) or map (m) parameter when using `location`.
+      // Default z to 14 so a bare `location` call succeeds.
+      let z = readNumberParam(args, "z", { integer: true }) ?? undefined;
+      if (location && z === undefined) {
+        z = 14;
+      }
       const raw = await callSerpApi({
         cfg,
         engine: "google_maps",
@@ -78,6 +96,7 @@ export function createSerpApiMapsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
           type: "search",
           ll: ll ?? undefined,
           location: location ?? undefined,
+          z,
           gl: readStringParam(args, "gl") ?? undefined,
           nearby: readStringParam(args, "nearby") ?? undefined,
           start: readNumberParam(args, "start", { integer: true }) ?? undefined,
