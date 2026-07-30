@@ -1,4 +1,10 @@
-# @serpapi/openclaw-plugin
+# SerpApi for OpenClaw personal AI Assistant
+
+[![ClawHub version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fclawhub.ai%2Fapi%2Fv1%2Fpackages%2F%40serpapi%2Fopenclaw-plugin&query=%24.package.latestVersion&prefix=v&label=clawhub&color=blue)](https://clawhub.ai/serpapi/plugins/@serpapi/openclaw-plugin)
+[![ClawHub downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fclawhub.ai%2Fapi%2Fv1%2Fpackages%2F%40serpapi%2Fopenclaw-plugin&query=%24.package.stats.downloads&label=downloads&color=blue)](https://clawhub.ai/serpapi/plugins/@serpapi/openclaw-plugin)
+[![CI](https://github.com/serpapi/serpapi-openclaw-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-openclaw-plugin/actions/workflows/ci.yml)
+[![Node](https://img.shields.io/badge/node-%3E%3D22.19-brightgreen.svg)](https://nodejs.org)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/serpapi/serpapi-openclaw-plugin/blob/main/LICENSE)
 
 SerpApi search plugin for [OpenClaw](https://docs.openclaw.ai). Registers a
 `web_search` provider plus specialized SerpApi tools, distributed through
@@ -77,6 +83,11 @@ clawhub package publish . --family code-plugin --dry-run
 clawhub package publish . --family code-plugin
 ```
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, tests, pull
+request guidelines, and the release process.
+
 ## License
 
-MIT
+[MIT](https://github.com/serpapi/serpapi-openclaw-plugin/blob/main/LICENSE)
