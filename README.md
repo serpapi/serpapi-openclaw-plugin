@@ -14,11 +14,14 @@ SerpApi search plugin for [OpenClaw](https://docs.openclaw.ai). Registers a
 
 - **`web_search` provider** — "SerpApi Search", backed by SerpApi's Google Light
   engine (fastest Google Search API).
+- **30 specialized tools** covering Google News, Scholar, Maps (+reviews),
+  Shopping, Flights, Hotels, Events, Jobs, Trends, Finance, Lens, Autocomplete,
+  Bing, DuckDuckGo, Yahoo, YouTube (search, video, transcript), Amazon, eBay,
+  Walmart, Google Immersive Product, Tripadvisor, Weather, and Facebook /
+  Instagram public profiles.
 
-Specialized SerpApi verticals (news, flights, maps, shopping, scholar, finance,
-YouTube, hotels, events, e-commerce, etc.) follow the same tool pattern and are
-added as dedicated tools in subsequent releases, delivered through pull
-requests.
+See [`skills/serpapi/SKILL.md`](skills/serpapi/SKILL.md) for per-tool parameters
+and usage guidance.
 
 ## Install
 
