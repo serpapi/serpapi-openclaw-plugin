@@ -1,0 +1,123 @@
+name: Publish release to ClawHub
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CLAWHUB_OWNER: serpapi
+
+jobs:
+  validate:
+    name: Node ${{ matrix.node-version }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24]
+
+    steps:
+      - name: Check out the released revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          version: 10.33.1
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Install the ClawHub CLI
+        run: npm install -g clawhub@latest
+
+      - name: ClawHub validate
+        run: clawhub package validate .
+
+  publish:
+    name: Publish to ClawHub
+    needs: validate
+    runs-on: ubuntu-latest
+    environment:
+      name: release
+      url: https://clawhub.ai/serpapi
+
+    steps:
+      - name: Check out the released revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          version: 10.33.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify the release tag matches the package version
+        if: github.event_name == 'release'
+        shell: bash
+        run: |
+          package_version="$(node -p "require('./package.json').version")"
+          if [[ "${GITHUB_REF_NAME}" != "v${package_version}" ]]; then
+            echo "Release tag ${GITHUB_REF_NAME} must equal v${package_version}." >&2
+            exit 1
+          fi
+
+      - name: Build
+        # ClawHub packs the folder with `npm pack --ignore-scripts`, so the
+        # compiled `dist/` must already exist on disk before publishing.
+        run: pnpm run build
+
+      - name: Install the ClawHub CLI
+        run: npm install -g clawhub@latest
+
+      - name: Sign in to ClawHub
+        env:
+          CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
+        run: |
+          if [ -z "$CLAWHUB_TOKEN" ]; then
+            echo "::error::CLAWHUB_TOKEN secret is required to publish."
+            exit 1
+          fi
+          clawhub login --token "$CLAWHUB_TOKEN"
+          clawhub whoami
+
+      - name: ClawHub validate
+        run: clawhub package validate .
+
+      - name: ClawHub publish (dry run)
+        run: |
+          clawhub package publish . \
+            --family code-plugin \
+            --owner "$CLAWHUB_OWNER" \
+            --dry-run
+
+      - name: ClawHub publish
+        run: |
+          clawhub package publish . \
+            --family code-plugin \
+            --owner "$CLAWHUB_OWNER"

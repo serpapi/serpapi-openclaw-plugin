@@ -70,11 +70,22 @@ The plugin targets `openclaw >= 2026.6.11` and imports the plugin SDK from the
 
 ## Publish to ClawHub
 
+Releases are published to the `serpapi` ClawHub organization by the
+[release workflow](.github/workflows/release.yml) when a GitHub Release is
+published. Publish manually only as a fallback:
+
 ```bash
 pnpm run build
+clawhub login
 clawhub package validate .
-clawhub package publish . --family code-plugin --dry-run
-clawhub package publish . --family code-plugin
+clawhub package publish . --family code-plugin --owner serpapi --dry-run
+clawhub package publish . --family code-plugin --owner serpapi
+```
+
+The `serpapi` organization is created once, by a maintainer, with:
+
+```bash
+clawhub publisher create serpapi --display-name "SerpApi"
 ```
 
 ## License
