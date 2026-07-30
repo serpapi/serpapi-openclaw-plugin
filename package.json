@@ -1,6 +1,6 @@
 {
   "name": "@serpapi/openclaw-plugin",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "SerpApi web search provider for OpenClaw (Google Light, 100+ engines). Specialized SerpApi tools follow in subsequent releases.",
   "keywords": [
     "openclaw",
