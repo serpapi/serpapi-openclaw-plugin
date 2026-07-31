@@ -6,11 +6,11 @@ import {
   writeCachedSearchPayload,
 } from "openclaw/plugin-sdk/provider-web-search";
 import {
-  DEFAULT_SERPAPI_TIMEOUT_SECONDS,
   resolveSerpApiKey,
   resolveSerpApiLanguage,
   SERPAPI_BASE_URL,
   SERPAPI_CACHE_TTL_MS,
+  SERPAPI_DEFAULT_TIMEOUT_SECONDS,
 } from "./config.js";
 
 // In-process result cache — aligns with SerpApi's 1-hour server-side cache window.
@@ -82,7 +82,7 @@ export async function callSerpApi(opts: SerpApiCallParams): Promise<Record<strin
   const result = await withTrustedWebSearchEndpoint(
     {
       url,
-      timeoutSeconds: opts.timeoutSeconds ?? DEFAULT_SERPAPI_TIMEOUT_SECONDS,
+      timeoutSeconds: opts.timeoutSeconds ?? SERPAPI_DEFAULT_TIMEOUT_SECONDS,
       signal: opts.signal,
       init: {
         method: "GET",
