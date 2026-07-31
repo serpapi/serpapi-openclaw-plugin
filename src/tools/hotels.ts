@@ -1,12 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import {
-  jsonResult,
-  readNumberParam,
-  readStringParam,
-} from "openclaw/plugin-sdk/provider-web-search";
+import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, readBooleanArg, resolveToolConfig } from "../utils.js";
+import { readBooleanArg, resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
 const ALLOWED_PARAMS = [
   "q",
@@ -34,7 +30,7 @@ function isoDateOffset(days: number): string {
 
 function isoDateOffsetFrom(isoDate: string, days: number): string {
   const d = new Date(`${isoDate}T00:00:00Z`);
-  if (isNaN(d.getTime())) return isoDateOffset(days + 1); // fallback: today + days+1
+  if (Number.isNaN(d.getTime())) return isoDateOffset(days + 1); // fallback: today + days+1
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
 }
@@ -117,9 +113,7 @@ export function createSerpApiHotelsTool(api: OpenClawPluginApi, ctx?: SerpApiToo
       const rawCheckIn = readStringParam(args, "check_in_date");
       const rawCheckOut = readStringParam(args, "check_out_date");
       const checkIn = rawCheckIn ? parseIsoDate(rawCheckIn, "check_in_date") : isoDateOffset(1);
-      const checkOut = rawCheckOut
-        ? parseIsoDate(rawCheckOut, "check_out_date")
-        : isoDateOffsetFrom(checkIn, 2);
+      const checkOut = rawCheckOut ? parseIsoDate(rawCheckOut, "check_out_date") : isoDateOffsetFrom(checkIn, 2);
       if (checkOut <= checkIn) {
         throw new Error("serpapi_hotels: check_out_date must be after check_in_date");
       }
