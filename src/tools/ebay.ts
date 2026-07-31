@@ -1,12 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import {
-  jsonResult,
-  readNumberParam,
-  readStringParam,
-} from "openclaw/plugin-sdk/provider-web-search";
+import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
+import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
 const ALLOWED_PARAMS = [
   "_nkw",
@@ -58,8 +54,7 @@ export function createSerpApiEbayTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
         buying_format: {
           type: "string",
           enum: ["Auction", "BIN", "BO"],
-          description:
-            "Filter by buying format: Auction, BIN (Buy It Now), or BO (Accepts Offers).",
+          description: "Filter by buying format: Auction, BIN (Buy It Now), or BO (Accepts Offers).",
         },
         show_only: {
           type: "string",
@@ -77,13 +72,11 @@ export function createSerpApiEbayTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
         },
         sort: {
           type: "number",
-          description:
-            "Sort order numeric code. See serpapi.com/ebay-sort-options. Default is Best Match.",
+          description: "Sort order numeric code. See serpapi.com/ebay-sort-options. Default is Best Match.",
         },
         category_id: {
           type: "string",
-          description:
-            "Category ID to narrow search. Obtain from a previous results' categories array.",
+          description: "Category ID to narrow search. Obtain from a previous results' categories array.",
         },
         condition: {
           type: "string",

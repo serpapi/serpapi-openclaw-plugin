@@ -1,28 +1,13 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import {
-  jsonResult,
-  readNumberParam,
-  readStringParam,
-} from "openclaw/plugin-sdk/provider-web-search";
+import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
+import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
-const ALLOWED_PARAMS = [
-  "q",
-  "gl",
-  "hl",
-  "location",
-  "lrad",
-  "uds",
-  "next_page_token",
-  "zero_trace",
-] as const;
+const ALLOWED_PARAMS = ["q", "gl", "hl", "location", "lrad", "uds", "next_page_token", "zero_trace"] as const;
 
 function extract(raw: Record<string, unknown>, maxCount: number): Record<string, unknown> {
-  const results = Array.isArray(raw.jobs_results)
-    ? (raw.jobs_results as unknown[]).slice(0, maxCount)
-    : [];
+  const results = Array.isArray(raw.jobs_results) ? (raw.jobs_results as unknown[]).slice(0, maxCount) : [];
   return {
     engine: "google_jobs",
     results,

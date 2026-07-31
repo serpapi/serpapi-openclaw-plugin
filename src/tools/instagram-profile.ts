@@ -2,7 +2,7 @@ import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
 import { jsonResult, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
+import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
 const ALLOWED_PARAMS = ["profile_id", "next_page_token", "zero_trace"] as const;
 
@@ -36,8 +36,7 @@ export function createSerpApiInstagramProfileTool(api: OpenClawPluginApi, ctx?: 
         },
         next_page_token: {
           type: "string",
-          description:
-            "Pagination token from serpapi_pagination.next_page_token returned in a previous response.",
+          description: "Pagination token from serpapi_pagination.next_page_token returned in a previous response.",
         },
       },
       required: ["profile_id"],

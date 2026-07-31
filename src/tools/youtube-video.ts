@@ -2,7 +2,7 @@ import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
 import { jsonResult, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
+import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
 const ALLOWED_PARAMS = ["v", "gl", "hl", "next_page_token", "zero_trace"] as const;
 
@@ -39,8 +39,7 @@ export function createSerpApiYouTubeVideoTool(api: OpenClawPluginApi, ctx?: Serp
       properties: {
         v: {
           type: "string",
-          description:
-            "YouTube video ID (e.g. 'dQw4w9WgXcQ' from youtube.com/watch?v=dQw4w9WgXcQ).",
+          description: "YouTube video ID (e.g. 'dQw4w9WgXcQ' from youtube.com/watch?v=dQw4w9WgXcQ).",
         },
         hl: {
           type: "string",

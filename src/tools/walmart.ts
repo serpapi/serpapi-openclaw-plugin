@@ -1,12 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import {
-  jsonResult,
-  readNumberParam,
-  readStringParam,
-} from "openclaw/plugin-sdk/provider-web-search";
+import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
+import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
 const ALLOWED_PARAMS = [
   "query",
@@ -47,8 +43,7 @@ export function createSerpApiWalmartTool(api: OpenClawPluginApi, ctx?: SerpApiTo
         },
         walmart_domain: {
           type: "string",
-          description:
-            "Walmart domain to use (e.g. walmart.ca, walmart.com.mx). Defaults to walmart.com.",
+          description: "Walmart domain to use (e.g. walmart.ca, walmart.com.mx). Defaults to walmart.com.",
         },
         sort: {
           type: "string",
@@ -63,8 +58,7 @@ export function createSerpApiWalmartTool(api: OpenClawPluginApi, ctx?: SerpApiTo
         },
         facet: {
           type: "string",
-          description:
-            "Attribute filters as key:value pairs separated by || (e.g. 'brand:Apple||color:Red').",
+          description: "Attribute filters as key:value pairs separated by || (e.g. 'brand:Apple||color:Red').",
         },
         store_id: {
           type: "string",

@@ -1,13 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import {
-  jsonResult,
-  readNumberParam,
-  readStringParam,
-  wrapWebContent,
-} from "openclaw/plugin-sdk/provider-web-search";
+import { jsonResult, readNumberParam, readStringParam, wrapWebContent } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
+import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
 const ALLOWED_PARAMS = [
   "data_id",
@@ -76,8 +71,7 @@ export function createSerpApiMapsReviewsTool(api: OpenClawPluginApi, ctx?: SerpA
         },
         topic_id: {
           type: "string",
-          description:
-            "Filter reviews by topic ID (from the topics array in the response). Cannot be used with query.",
+          description: "Filter reviews by topic ID (from the topics array in the response). Cannot be used with query.",
         },
         query: {
           type: "string",
@@ -92,8 +86,7 @@ export function createSerpApiMapsReviewsTool(api: OpenClawPluginApi, ctx?: SerpA
         },
         next_page_token: {
           type: "string",
-          description:
-            "Pagination token from serpapi_pagination.next_page_token to fetch the next page.",
+          description: "Pagination token from serpapi_pagination.next_page_token to fetch the next page.",
         },
       },
       required: [],

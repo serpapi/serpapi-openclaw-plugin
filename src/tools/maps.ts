@@ -1,30 +1,13 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import {
-  jsonResult,
-  readNumberParam,
-  readStringParam,
-} from "openclaw/plugin-sdk/provider-web-search";
+import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
+import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
-const ALLOWED_PARAMS = [
-  "q",
-  "gl",
-  "hl",
-  "ll",
-  "location",
-  "z",
-  "type",
-  "nearby",
-  "start",
-  "zero_trace",
-] as const;
+const ALLOWED_PARAMS = ["q", "gl", "hl", "ll", "location", "z", "type", "nearby", "start", "zero_trace"] as const;
 
 function extract(raw: Record<string, unknown>, maxCount: number): Record<string, unknown> {
-  const results = Array.isArray(raw.local_results)
-    ? (raw.local_results as unknown[]).slice(0, maxCount)
-    : [];
+  const results = Array.isArray(raw.local_results) ? (raw.local_results as unknown[]).slice(0, maxCount) : [];
   return {
     engine: "google_maps",
     results,
@@ -50,8 +33,7 @@ export function createSerpApiMapsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
         },
         location: {
           type: "string",
-          description:
-            "City or area string (e.g. 'Austin, Texas'). Requires a zoom level; z defaults to 14.",
+          description: "City or area string (e.g. 'Austin, Texas'). Requires a zoom level; z defaults to 14.",
         },
         z: {
           type: "number",
@@ -68,8 +50,7 @@ export function createSerpApiMapsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
         gl: { type: "string", description: "Country code (e.g. us, de, ua)." },
         nearby: {
           type: "string",
-          description:
-            "Force results near this location. Recommended when query contains 'near me'.",
+          description: "Force results near this location. Recommended when query contains 'near me'.",
         },
         start: { type: "number", description: "Result offset for pagination (0, 20, 40...)." },
       },

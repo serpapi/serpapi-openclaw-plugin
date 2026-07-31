@@ -1,29 +1,13 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import {
-  jsonResult,
-  readNumberParam,
-  readStringParam,
-  wrapWebContent,
-} from "openclaw/plugin-sdk/provider-web-search";
+import { jsonResult, readNumberParam, readStringParam, wrapWebContent } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, readBooleanArg, resolveToolConfig } from "../utils.js";
+import { readBooleanArg, resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
-const ALLOWED_PARAMS = [
-  "q",
-  "kl",
-  "safe",
-  "df",
-  "m",
-  "start",
-  "search_assist",
-  "zero_trace",
-] as const;
+const ALLOWED_PARAMS = ["q", "kl", "safe", "df", "m", "start", "search_assist", "zero_trace"] as const;
 
 function extract(raw: Record<string, unknown>): Record<string, unknown> {
-  const organicResults = Array.isArray(raw.organic_results)
-    ? (raw.organic_results as Record<string, unknown>[])
-    : [];
+  const organicResults = Array.isArray(raw.organic_results) ? (raw.organic_results as Record<string, unknown>[]) : [];
   const kg = raw.knowledge_graph as Record<string, unknown> | undefined;
   return {
     engine: "duckduckgo",
@@ -35,10 +19,7 @@ function extract(raw: Record<string, unknown>): Record<string, unknown> {
     knowledge_graph: kg
       ? {
           title: typeof kg.title === "string" ? wrapWebContent(kg.title) : (kg.title ?? null),
-          description:
-            typeof kg.description === "string"
-              ? wrapWebContent(kg.description)
-              : (kg.description ?? null),
+          description: typeof kg.description === "string" ? wrapWebContent(kg.description) : (kg.description ?? null),
           website: kg.website ?? null,
           facts: kg.facts ?? null,
         }
@@ -66,8 +47,7 @@ export function createSerpApiDuckDuckGoTool(api: OpenClawPluginApi, ctx?: SerpAp
         },
         kl: {
           type: "string",
-          description:
-            "Region code (e.g. us-en, uk-en, de-de, fr-fr). Controls language and region of results.",
+          description: "Region code (e.g. us-en, uk-en, de-de, fr-fr). Controls language and region of results.",
         },
         safe: {
           type: "number",
@@ -81,8 +61,7 @@ export function createSerpApiDuckDuckGoTool(api: OpenClawPluginApi, ctx?: SerpAp
         },
         m: {
           type: "number",
-          description:
-            "Maximum results to return (1–50, default: 50). Cannot be used with search_assist.",
+          description: "Maximum results to return (1–50, default: 50). Cannot be used with search_assist.",
           minimum: 1,
           maximum: 50,
         },
@@ -94,8 +73,7 @@ export function createSerpApiDuckDuckGoTool(api: OpenClawPluginApi, ctx?: SerpAp
         },
         search_assist: {
           type: "boolean",
-          description:
-            "Include DuckDuckGo AI Search Assist answer in the response. Cannot be used with m.",
+          description: "Include DuckDuckGo AI Search Assist answer in the response. Cannot be used with m.",
         },
       },
       required: ["query"],
