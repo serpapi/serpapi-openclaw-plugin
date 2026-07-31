@@ -9,6 +9,9 @@ on:
 permissions:
   contents: read
 
+env:
+  CLAWHUB_OWNER: serpapi
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -54,4 +57,8 @@ jobs:
         run: clawhub package validate .
 
       - name: ClawHub publish (dry run)
-        run: clawhub package publish . --family code-plugin --dry-run
+        run: |
+          clawhub package publish . \
+            --family code-plugin \
+            --owner "$CLAWHUB_OWNER" \
+            --dry-run

@@ -53,6 +53,9 @@ jobs:
 
   publish:
     name: Publish to ClawHub
+    # `workflow_dispatch` runs only the validate job: publishing must always
+    # come from a published release so the checked-out ref is the release tag.
+    if: github.event_name == 'release'
     needs: validate
     runs-on: ubuntu-latest
     environment:
@@ -78,7 +81,6 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Verify the release tag matches the package version
-        if: github.event_name == 'release'
         shell: bash
         run: |
           package_version="$(node -p "require('./package.json').version")"
