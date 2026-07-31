@@ -90,4 +90,4 @@ request guidelines, and the release process.
 
 ## License
 
-[MIT](https://github.com/serpapi/serpapi-openclaw-plugin/blob/main/LICENSE)
+[MIT](LICENSE)
