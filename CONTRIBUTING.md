@@ -54,11 +54,11 @@ to [npm](https://www.npmjs.com/package/@serpapi/openclaw-plugin) and to
 [ClawHub](https://docs.openclaw.ai/clawhub). Both targets are enabled in the
 `openclaw.release` section of `package.json`.
 
-Releases will be published by GitHub Actions, triggered by publishing a GitHub
-Release. The workflow will use npm trusted publishing, so the repository will
-not need an `NPM_TOKEN` secret. That workflow is not in place yet, so until
-`.github/workflows/release.yml` lands, a maintainer publishes manually with the
-steps below.
+Releases are published by
+[`.github/workflows/release.yml`](.github/workflows/release.yml), triggered by
+publishing a GitHub Release. The workflow needs repository secrets `NPM_TOKEN`
+and `CLAWHUB_TOKEN` for the publish jobs. Publishing only runs for
+`release` events; `workflow_dispatch` stops after verification.
 
 ### Publish a release
 
@@ -79,14 +79,17 @@ steps below.
 
 3. Merge the version change into `main`.
 4. Tag the release with `v` followed by the package version, such as `v1.0.1`,
-   and publish a GitHub Release for that tag.
-5. Publish the package:
+   and publish a GitHub Release for that tag. The release tag must match
+   `v` plus the `package.json` version.
+5. Confirm the release workflow published to npm and ClawHub.
 
-   ```bash
-   pnpm publish --access public
-   clawhub package publish . --family code-plugin --dry-run
-   clawhub package publish . --family code-plugin
-   ```
+If you need to publish manually instead of through Actions:
+
+```bash
+pnpm publish --access public
+clawhub package publish . --family code-plugin --dry-run
+clawhub package publish . --family code-plugin
+```
 
 `prepublishOnly` cleans `dist/` and rebuilds, so the published files always come
 from a fresh build.
