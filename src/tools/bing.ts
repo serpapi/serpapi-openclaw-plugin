@@ -1,29 +1,13 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import {
-  jsonResult,
-  readNumberParam,
-  readStringParam,
-  wrapWebContent,
-} from "openclaw/plugin-sdk/provider-web-search";
+import { jsonResult, readNumberParam, readStringParam, wrapWebContent } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
+import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
-const ALLOWED_PARAMS = [
-  "q",
-  "cc",
-  "mkt",
-  "location",
-  "safeSearch",
-  "filters",
-  "first",
-  "zero_trace",
-] as const;
+const ALLOWED_PARAMS = ["q", "cc", "mkt", "location", "safeSearch", "filters", "first", "zero_trace"] as const;
 
 function extract(raw: Record<string, unknown>): Record<string, unknown> {
-  const organicResults = Array.isArray(raw.organic_results)
-    ? (raw.organic_results as Record<string, unknown>[])
-    : [];
+  const organicResults = Array.isArray(raw.organic_results) ? (raw.organic_results as Record<string, unknown>[]) : [];
   return {
     engine: "bing",
     results: organicResults.map((r) => ({
@@ -48,8 +32,7 @@ export function createSerpApiBingTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
       properties: {
         query: {
           type: "string",
-          description:
-            "Search query string. Supports Bing operators: NOT, OR, site:, filetype:, near:.",
+          description: "Search query string. Supports Bing operators: NOT, OR, site:, filetype:, near:.",
         },
         mkt: {
           type: "string",
@@ -71,8 +54,7 @@ export function createSerpApiBingTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
         },
         first: {
           type: "number",
-          description:
-            "Result offset for pagination (default: 1; use 11 for page 2, 21 for page 3, ...).",
+          description: "Result offset for pagination (default: 1; use 11 for page 2, 21 for page 3, ...).",
           minimum: 1,
         },
       },
@@ -84,9 +66,7 @@ export function createSerpApiBingTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
       const mkt = readStringParam(args, "mkt");
       const cc = readStringParam(args, "cc");
       if (mkt && cc) {
-        throw new Error(
-          "serpapi_bing: mkt and cc are mutually exclusive; provide one or the other",
-        );
+        throw new Error("serpapi_bing: mkt and cc are mutually exclusive; provide one or the other");
       }
       const raw = await callSerpApi({
         cfg,

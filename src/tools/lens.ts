@@ -2,18 +2,9 @@ import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
 import { jsonResult, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, readBooleanArg, resolveToolConfig } from "../utils.js";
+import { readBooleanArg, resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
-const ALLOWED_PARAMS = [
-  "url",
-  "hl",
-  "country",
-  "type",
-  "q",
-  "safe",
-  "auto_crop",
-  "zero_trace",
-] as const;
+const ALLOWED_PARAMS = ["url", "hl", "country", "type", "q", "safe", "auto_crop", "zero_trace"] as const;
 
 function extract(raw: Record<string, unknown>): Record<string, unknown> {
   return {

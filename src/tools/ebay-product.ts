@@ -2,16 +2,9 @@ import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
 import { jsonResult, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
+import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
-const ALLOWED_PARAMS = [
-  "product_id",
-  "ebay_domain",
-  "locale",
-  "lang",
-  "shipping_country",
-  "zero_trace",
-] as const;
+const ALLOWED_PARAMS = ["product_id", "ebay_domain", "locale", "lang", "shipping_country", "zero_trace"] as const;
 
 function extract(raw: Record<string, unknown>): Record<string, unknown> {
   return {
@@ -35,8 +28,7 @@ export function createSerpApiEbayProductTool(api: OpenClawPluginApi, ctx?: SerpA
       properties: {
         product_id: {
           type: "string",
-          description:
-            "eBay product/item ID. Found in the listing URL (e.g. '30557685' from ebay.com/itm/30557685).",
+          description: "eBay product/item ID. Found in the listing URL (e.g. '30557685' from ebay.com/itm/30557685).",
         },
         ebay_domain: {
           type: "string",
@@ -48,8 +40,7 @@ export function createSerpApiEbayProductTool(api: OpenClawPluginApi, ctx?: SerpA
         },
         lang: {
           type: "string",
-          description:
-            "Language override (e.g. en-US). Only applicable on US eBay domain when locale is set.",
+          description: "Language override (e.g. en-US). Only applicable on US eBay domain when locale is set.",
         },
         shipping_country: {
           type: "string",

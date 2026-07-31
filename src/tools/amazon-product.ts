@@ -2,7 +2,7 @@ import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
 import { jsonResult, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
+import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
 const ALLOWED_PARAMS = [
   "asin",
@@ -15,13 +15,7 @@ const ALLOWED_PARAMS = [
 ] as const;
 
 function extract(raw: Record<string, unknown>): Record<string, unknown> {
-  const {
-    purchase_options,
-    related_products,
-    bought_together,
-    reviews_information,
-    product_results,
-  } = raw as {
+  const { purchase_options, related_products, bought_together, reviews_information, product_results } = raw as {
     purchase_options?: unknown;
     related_products?: unknown;
     bought_together?: unknown;
@@ -57,8 +51,7 @@ export function createSerpApiAmazonProductTool(api: OpenClawPluginApi, ctx?: Ser
         },
         amazon_domain: {
           type: "string",
-          description:
-            "Amazon domain to use (e.g. amazon.co.uk, amazon.de). Defaults to amazon.com.",
+          description: "Amazon domain to use (e.g. amazon.co.uk, amazon.de). Defaults to amazon.com.",
         },
         language: {
           type: "string",

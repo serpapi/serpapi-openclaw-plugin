@@ -1,12 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import {
-  jsonResult,
-  readNumberParam,
-  readStringParam,
-} from "openclaw/plugin-sdk/provider-web-search";
+import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
+import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
 const ALLOWED_PARAMS = ["q", "gl", "hl", "location", "htichips", "start", "zero_trace"] as const;
 
@@ -29,8 +25,7 @@ export function createSerpApiEventsTool(api: OpenClawPluginApi, ctx?: SerpApiToo
         location: { type: "string", description: 'Location string (e.g. "Austin, Texas").' },
         htichips: {
           type: "string",
-          description:
-            "Date filter: date:today, date:tomorrow, date:week, date:weekend, date:next_week, date:month.",
+          description: "Date filter: date:today, date:tomorrow, date:week, date:weekend, date:next_week, date:month.",
         },
         gl: { type: "string", description: "Country code (e.g. us, de, ua)." },
         hl: { type: "string", description: "Language code override." },

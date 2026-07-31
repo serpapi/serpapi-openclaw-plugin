@@ -1,23 +1,10 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import {
-  jsonResult,
-  readNumberParam,
-  readStringParam,
-} from "openclaw/plugin-sdk/provider-web-search";
+import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
+import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
-const ALLOWED_PARAMS = [
-  "q",
-  "lat",
-  "lon",
-  "tripadvisor_domain",
-  "ssrc",
-  "offset",
-  "limit",
-  "zero_trace",
-] as const;
+const ALLOWED_PARAMS = ["q", "lat", "lon", "tripadvisor_domain", "ssrc", "offset", "limit", "zero_trace"] as const;
 
 function extract(raw: Record<string, unknown>): Record<string, unknown> {
   return {
@@ -52,8 +39,7 @@ export function createSerpApiTripadvisorTool(api: OpenClawPluginApi, ctx?: SerpA
         },
         tripadvisor_domain: {
           type: "string",
-          description:
-            "Tripadvisor domain to use (e.g. 'www.tripadvisor.co.uk'). Defaults to tripadvisor.com.",
+          description: "Tripadvisor domain to use (e.g. 'www.tripadvisor.co.uk'). Defaults to tripadvisor.com.",
         },
         lat: {
           type: "number",
@@ -71,8 +57,7 @@ export function createSerpApiTripadvisorTool(api: OpenClawPluginApi, ctx?: SerpA
         },
         offset: {
           type: "number",
-          description:
-            "Result offset for pagination (default: 0; use 30 for page 2, 60 for page 3, ...).",
+          description: "Result offset for pagination (default: 0; use 30 for page 2, 60 for page 3, ...).",
           minimum: 0,
         },
       },

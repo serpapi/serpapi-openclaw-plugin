@@ -1,25 +1,10 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import {
-  jsonResult,
-  readNumberParam,
-  readStringParam,
-  wrapWebContent,
-} from "openclaw/plugin-sdk/provider-web-search";
+import { jsonResult, readNumberParam, readStringParam, wrapWebContent } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { type SerpApiToolCtx, resolveToolConfig } from "../utils.js";
+import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
 
-const ALLOWED_PARAMS = [
-  "p",
-  "yahoo_domain",
-  "vc",
-  "vl",
-  "b",
-  "vm",
-  "vs",
-  "vf",
-  "zero_trace",
-] as const;
+const ALLOWED_PARAMS = ["p", "yahoo_domain", "vc", "vl", "b", "vm", "vs", "vf", "zero_trace"] as const;
 
 function extract(raw: Record<string, unknown>): Record<string, unknown> {
   const organicResults = Array.isArray(raw.organic_results)
@@ -56,8 +41,7 @@ export function createSerpApiYahooTool(api: OpenClawPluginApi, ctx?: SerpApiTool
         },
         yahoo_domain: {
           type: "string",
-          description:
-            "Yahoo! domain to use (e.g. 'fr' for fr.search.yahoo.com). Defaults to search.yahoo.com.",
+          description: "Yahoo! domain to use (e.g. 'fr' for fr.search.yahoo.com). Defaults to search.yahoo.com.",
         },
         vc: {
           type: "string",
@@ -65,8 +49,7 @@ export function createSerpApiYahooTool(api: OpenClawPluginApi, ctx?: SerpApiTool
         },
         vl: {
           type: "string",
-          description:
-            "Language filter in the format lang_{code} (e.g. lang_fr to search French only).",
+          description: "Language filter in the format lang_{code} (e.g. lang_fr to search French only).",
         },
         vm: {
           type: "string",
@@ -83,8 +66,7 @@ export function createSerpApiYahooTool(api: OpenClawPluginApi, ctx?: SerpApiTool
         },
         b: {
           type: "number",
-          description:
-            "Result offset for pagination (default: 1; use 11 for page 2, 21 for page 3, ...).",
+          description: "Result offset for pagination (default: 1; use 11 for page 2, 21 for page 3, ...).",
           minimum: 1,
         },
       },
