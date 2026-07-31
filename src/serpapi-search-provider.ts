@@ -34,9 +34,7 @@ const ALLOWED_PARAMS = [
 ] as const;
 
 function extract(raw: Record<string, unknown>, maxCount: number): Record<string, unknown> {
-  const organicResults = Array.isArray(raw.organic_results)
-    ? (raw.organic_results as Record<string, unknown>[])
-    : [];
+  const organicResults = Array.isArray(raw.organic_results) ? (raw.organic_results as Record<string, unknown>[]) : [];
   return {
     engine: "google_light",
     results: organicResults.slice(0, maxCount).map((r) => ({
@@ -65,8 +63,7 @@ const SerpApiGoogleLightSearchSchema = {
     },
     location: {
       type: "string",
-      description:
-        "Location to originate the search from (e.g. 'Austin, Texas'). Cannot be used with uule.",
+      description: "Location to originate the search from (e.g. 'Austin, Texas'). Cannot be used with uule.",
     },
     uule: {
       type: "string",
@@ -87,8 +84,7 @@ const SerpApiGoogleLightSearchSchema = {
     },
     start: {
       type: "number",
-      description:
-        "Result offset for pagination (0=first page, 10=second page, 20=third page, ...).",
+      description: "Result offset for pagination (0=first page, 10=second page, 20=third page, ...).",
       minimum: 0,
     },
   },

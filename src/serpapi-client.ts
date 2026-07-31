@@ -6,11 +6,11 @@ import {
   writeCachedSearchPayload,
 } from "openclaw/plugin-sdk/provider-web-search";
 import {
-  DEFAULT_SERPAPI_TIMEOUT_SECONDS,
-  SERPAPI_BASE_URL,
-  SERPAPI_CACHE_TTL_MS,
   resolveSerpApiKey,
   resolveSerpApiLanguage,
+  SERPAPI_BASE_URL,
+  SERPAPI_CACHE_TTL_MS,
+  SERPAPI_DEFAULT_TIMEOUT_SECONDS,
 } from "./config.js";
 
 // In-process result cache — aligns with SerpApi's 1-hour server-side cache window.
@@ -82,7 +82,7 @@ export async function callSerpApi(opts: SerpApiCallParams): Promise<Record<strin
   const result = await withTrustedWebSearchEndpoint(
     {
       url,
-      timeoutSeconds: opts.timeoutSeconds ?? DEFAULT_SERPAPI_TIMEOUT_SECONDS,
+      timeoutSeconds: opts.timeoutSeconds ?? SERPAPI_DEFAULT_TIMEOUT_SECONDS,
       signal: opts.signal,
       init: {
         method: "GET",
@@ -96,10 +96,8 @@ export async function callSerpApi(opts: SerpApiCallParams): Promise<Record<strin
       if (!response.ok) {
         const text = await response.text().catch(() => response.statusText);
         if (response.status === 401) throw new Error("SerpApi: invalid or missing API key.");
-        if (response.status === 429)
-          throw new Error("SerpApi: quota exhausted. Narrow the request or try later.");
-        if (response.status >= 500)
-          throw new Error(`SerpApi: upstream error (${response.status}). Try again shortly.`);
+        if (response.status === 429) throw new Error("SerpApi: quota exhausted. Narrow the request or try later.");
+        if (response.status >= 500) throw new Error(`SerpApi: upstream error (${response.status}). Try again shortly.`);
         throw new Error(`SerpApi (${opts.engine}) error (${response.status}): ${text}`);
       }
       const text = await response.text();

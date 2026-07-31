@@ -1,6 +1,6 @@
 {
   "name": "@serpapi/openclaw-plugin",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "SerpApi web search provider for OpenClaw (Google Light, 100+ engines). Specialized SerpApi tools follow in subsequent releases.",
   "keywords": [
     "openclaw",
@@ -35,12 +35,15 @@
     "build": "tsc -p tsconfig.json",
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm run clean && pnpm run build",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "biome ci .",
+    "format": "biome check --write ."
   },
   "peerDependencies": {
     "openclaw": ">=2026.6.11"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.6",
     "@types/node": "^22.20.1",
     "openclaw": "2026.6.11",
     "typescript": "^5.6.0"

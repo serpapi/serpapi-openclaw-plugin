@@ -1,7 +1,4 @@
-import {
-  definePluginEntry,
-  type OpenClawPluginDefinition,
-} from "openclaw/plugin-sdk/plugin-entry";
+import { definePluginEntry, type OpenClawPluginDefinition } from "openclaw/plugin-sdk/plugin-entry";
 import { createSerpApiWebSearchProvider } from "./src/serpapi-search-provider.js";
 import {
   createSerpApiAmazonTool,
