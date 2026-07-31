@@ -65,7 +65,7 @@ steps below.
 1. Set the package version:
 
    ```bash
-   pnpm version 1.0.1 --no-git-tag-version
+   pnpm version <version> --no-git-tag-version
    ```
 
 2. Run the full check set:
