@@ -1,4 +1,4 @@
-name: Publish release to ClawHub
+name: Publish release
 
 on:
   release:
@@ -12,7 +12,7 @@ env:
   CLAWHUB_OWNER: serpapi
 
 jobs:
-  validate:
+  test:
     name: Node ${{ matrix.node-version }}
     runs-on: ubuntu-latest
 
@@ -22,7 +22,7 @@ jobs:
         node-version: [22, 24]
 
     steps:
-      - name: Check out the repository
+      - name: Check out the released revision
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up pnpm
@@ -39,28 +39,16 @@ jobs:
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Lint
+        run: pnpm run lint
+
       - name: Typecheck
         run: pnpm run typecheck
 
-      - name: Build
-        run: pnpm run build
-
-      - name: Install the ClawHub CLI
-        run: npm install -g clawhub@latest
-
-      - name: ClawHub validate
-        run: clawhub package validate .
-
-  publish:
-    name: Publish to ClawHub
-    # `workflow_dispatch` runs only the validate job: publishing must always
-    # come from a published release so the checked-out ref is the release tag.
-    if: github.event_name == 'release'
-    needs: validate
+  build:
+    name: Build release distribution
+    needs: test
     runs-on: ubuntu-latest
-    environment:
-      name: release
-      url: https://clawhub.ai/serpapi
 
     steps:
       - name: Check out the released revision
@@ -81,6 +69,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Verify the release tag matches the package version
+        if: github.event_name == 'release'
         shell: bash
         run: |
           package_version="$(node -p "require('./package.json').version")"
@@ -90,9 +79,168 @@ jobs:
           fi
 
       - name: Build
-        # ClawHub packs the folder with `npm pack --ignore-scripts`, so the
-        # compiled `dist/` must already exist on disk before publishing.
         run: pnpm run build
+
+      - name: Pack the release tarball
+        # Both registries publish this exact tarball, so the compiled output is
+        # never rebuilt after this point.
+        run: npm pack
+
+      - name: Upload the release tarball
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: release-tarball
+          path: "*.tgz"
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload the compiled output
+        # ClawHub packs a working directory rather than a tarball, so it needs
+        # `dist/` on disk. Reusing this artifact keeps it byte-identical to the
+        # tarball published to npm.
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: compiled-output
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  verify:
+    name: Verify the built tarball
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the released revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Download the release tarball
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: release-tarball
+          path: artifact/
+
+      - name: Install the tarball against the supported host
+        shell: bash
+        run: |
+          host_version="$(node -p "require('./package.json').devDependencies.openclaw")"
+          mkdir -p "${RUNNER_TEMP}/smoke"
+          cd "${RUNNER_TEMP}/smoke"
+          npm init -y > /dev/null
+          npm pkg set type=module > /dev/null
+          npm install --no-audit --no-fund \
+            "${GITHUB_WORKSPACE}"/artifact/*.tgz \
+            "openclaw@${host_version}"
+
+      - name: Load the plugin entry point
+        shell: bash
+        run: |
+          cd "${RUNNER_TEMP}/smoke"
+          node --input-type=module -e '
+            const manifest = await import(
+              "@serpapi/openclaw-plugin/package.json",
+              { with: { type: "json" } }
+            );
+            const [entry] = manifest.default.openclaw.extensions;
+            const plugin = (await import(`@serpapi/openclaw-plugin/${entry.slice(2)}`)).default;
+            if (typeof plugin?.register !== "function") {
+              throw new Error(`Plugin ${entry} exposes no register() function.`);
+            }
+            console.log(`Loaded ${plugin.id} (${plugin.name}) from ${entry}.`);
+          '
+
+      - name: Install the ClawHub CLI
+        run: npm install -g clawhub@latest
+
+      - name: ClawHub validate the packed contents
+        # Validate the extracted tarball rather than the repository, so the
+        # check runs against the exact files both registries receive.
+        shell: bash
+        run: |
+          mkdir -p "${RUNNER_TEMP}/packed"
+          tar -xzf artifact/*.tgz -C "${RUNNER_TEMP}/packed"
+          clawhub package validate "${RUNNER_TEMP}/packed/package"
+
+  publish-npm:
+    name: Publish to npm
+    # `workflow_dispatch` stops after `verify`: publishing must always come from
+    # a published release so the checked-out ref is the release tag.
+    if: github.event_name == 'release'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Required for npm provenance attestations.
+      id-token: write
+    environment:
+      name: release
+      url: https://www.npmjs.com/package/@serpapi/openclaw-plugin
+
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Download the verified tarball
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: release-tarball
+          path: artifact/
+
+      - name: Verify the npm token is present
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NPM_TOKEN" ]; then
+            echo "::error::NPM_TOKEN secret is required to publish."
+            exit 1
+          fi
+
+      - name: npm publish (dry run)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish artifact/*.tgz --access public --provenance --dry-run
+
+      - name: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish artifact/*.tgz --access public --provenance
+
+  publish-clawhub:
+    name: Publish to ClawHub
+    # `workflow_dispatch` stops after `verify`: publishing must always come from
+    # a published release so the checked-out ref is the release tag.
+    if: github.event_name == 'release'
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: release
+      url: https://clawhub.ai/serpapi
+
+    steps:
+      - name: Check out the released revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Download the compiled output
+        # ClawHub packs the folder with `npm pack --ignore-scripts`, so `dist/`
+        # must be on disk before publishing. It is restored from the verified
+        # build rather than rebuilt here.
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: compiled-output
+          path: dist/
 
       - name: Install the ClawHub CLI
         run: npm install -g clawhub@latest
@@ -107,9 +255,6 @@ jobs:
           fi
           clawhub login --token "$CLAWHUB_TOKEN"
           clawhub whoami
-
-      - name: ClawHub validate
-        run: clawhub package validate .
 
       - name: ClawHub publish (dry run)
         run: |

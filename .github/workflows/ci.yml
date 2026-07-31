@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
+  test:
     name: Node ${{ matrix.node-version }}
     runs-on: ubuntu-latest
 
@@ -43,6 +43,9 @@ jobs:
 
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm run lint
 
       - name: Typecheck
         run: pnpm run typecheck

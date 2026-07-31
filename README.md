@@ -61,18 +61,33 @@ Requires Node 22.19+ and [pnpm](https://pnpm.io).
 
 ```bash
 pnpm install
+pnpm run lint
 pnpm run typecheck
 pnpm run build
 ```
 
+Formatting and linting are handled by [Biome](https://biomejs.dev). `pnpm run
+lint` is the check CI runs; `pnpm run format` applies the fixes.
+
 The plugin targets `openclaw >= 2026.6.11` and imports the plugin SDK from the
 `openclaw/plugin-sdk/*` subpaths.
 
-## Publish to ClawHub
+## Publishing
 
-Releases are published to the `serpapi` ClawHub organization by the
-[release workflow](.github/workflows/release.yml) when a GitHub Release is
-published. Publish manually only as a fallback:
+Publishing a GitHub Release runs the
+[release workflow](.github/workflows/release.yml): `test` → `build` → `verify`
+→ `publish-npm` and `publish-clawhub`. `build` packs a single tarball, and both
+registries publish that same artifact, so the compiled output is never rebuilt
+after it has been verified. The release tag must equal
+`v<package.json version>` or the workflow fails before publishing anywhere.
+
+Running the workflow manually stops after `verify` and publishes nothing.
+
+Both registries require a repository secret: `CLAWHUB_TOKEN` and `NPM_TOKEN`.
+npm releases carry [provenance](https://docs.npmjs.com/generating-provenance-statements)
+attestations, so `NPM_TOKEN` must permit publishing to the `@serpapi` scope.
+
+Publish manually only as a fallback:
 
 ```bash
 pnpm run build
@@ -80,6 +95,9 @@ clawhub login
 clawhub package validate .
 clawhub package publish . --family code-plugin --owner serpapi --dry-run
 clawhub package publish . --family code-plugin --owner serpapi
+
+npm publish --access public --dry-run
+npm publish --access public
 ```
 
 The `serpapi` organization is created once, by a maintainer, with:
