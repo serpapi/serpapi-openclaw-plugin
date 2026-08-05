@@ -92,12 +92,15 @@ Publishing requires the `CLAWHUB_TOKEN` repository secret.
 Publish manually only as a fallback:
 
 ```bash
-pnpm run build
+pnpm run clean && pnpm run build
 clawhub login
 clawhub package validate .
 clawhub package publish . --family code-plugin --owner serpapi --dry-run
 clawhub package publish . --family code-plugin --owner serpapi
 ```
+
+The workflow always builds from a fresh checkout; locally, `clean` first so
+stale `tsc` output never reaches the package.
 
 The `serpapi` organization is created once, by a maintainer, with:
 

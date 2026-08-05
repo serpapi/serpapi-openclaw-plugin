@@ -87,8 +87,8 @@ If you need to publish manually instead of through Actions:
 
 ```bash
 pnpm run clean && pnpm run build
-clawhub package publish . --family code-plugin --dry-run
-clawhub package publish . --family code-plugin
+clawhub package publish . --family code-plugin --owner serpapi --dry-run
+clawhub package publish . --family code-plugin --owner serpapi
 ```
 
 Build from a clean `dist/` so the published files always come from a fresh
