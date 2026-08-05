@@ -50,14 +50,14 @@ Never commit an API key, and never paste one into an issue or pull request.
 
 Releases are published from
 [`serpapi/serpapi-openclaw-plugin`](https://github.com/serpapi/serpapi-openclaw-plugin)
-to [npm](https://www.npmjs.com/package/@serpapi/openclaw-plugin) and to
-[ClawHub](https://docs.openclaw.ai/clawhub). Both targets are enabled in the
-`openclaw.release` section of `package.json`.
+to [ClawHub](https://docs.openclaw.ai/clawhub), the only distribution channel
+for this plugin. The target is enabled in the `openclaw.release` section of
+`package.json`; the package is marked `private` and is never published to npm.
 
 Releases are published by
 [`.github/workflows/release.yml`](.github/workflows/release.yml), triggered by
-publishing a GitHub Release. The workflow needs repository secrets `NPM_TOKEN`
-and `CLAWHUB_TOKEN` for the publish jobs. Publishing only runs for
+publishing a GitHub Release. The workflow needs the `CLAWHUB_TOKEN` repository
+secret for the publish job. Publishing only runs for
 `release` events; `workflow_dispatch` stops after verification.
 
 ### Publish a release
@@ -81,22 +81,22 @@ and `CLAWHUB_TOKEN` for the publish jobs. Publishing only runs for
 4. Tag the release with `v` followed by the package version, such as `v1.0.1`,
    and publish a GitHub Release for that tag. The release tag must match
    `v` plus the `package.json` version.
-5. Confirm the release workflow published to npm and ClawHub.
+5. Confirm the release workflow published to ClawHub.
 
 If you need to publish manually instead of through Actions:
 
 ```bash
-pnpm publish --access public
+pnpm run clean && pnpm run build
 clawhub package publish . --family code-plugin --dry-run
 clawhub package publish . --family code-plugin
 ```
 
-`prepublishOnly` cleans `dist/` and rebuilds, so the published files always come
-from a fresh build.
+Build from a clean `dist/` so the published files always come from a fresh
+build.
 
-npm does not allow an uploaded version to be replaced. If publishing fails after
-the tarball has reached the registry, increment the package version and create a
-new GitHub Release.
+ClawHub does not allow an uploaded version to be replaced. If publishing fails
+after the package has reached the registry, increment the package version and
+create a new GitHub Release.
 
 ### Compatibility
 

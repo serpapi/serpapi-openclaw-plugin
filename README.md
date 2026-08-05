@@ -35,12 +35,6 @@ and usage guidance.
 openclaw plugins install clawhub:@serpapi/openclaw-plugin
 ```
 
-Or via npm during launch cutover:
-
-```bash
-openclaw plugins install npm:@serpapi/openclaw-plugin
-```
-
 ## Configure
 
 Set the API key via config or the `SERPAPI_API_KEY` environment variable:
@@ -85,16 +79,15 @@ The plugin targets `openclaw >= 2026.6.11` and imports the plugin SDK from the
 
 Publishing a GitHub Release runs the
 [release workflow](.github/workflows/release.yml): `test` → `build` → `verify`
-→ `publish-npm` and `publish-clawhub`. `build` packs a single tarball, and both
-registries publish that same artifact, so the compiled output is never rebuilt
-after it has been verified. The release tag must equal
-`v<package.json version>` or the workflow fails before publishing anywhere.
+→ `publish-clawhub`. ClawHub is the only distribution channel; the package is
+not published to npm. `build` produces the artifacts that `verify` and
+`publish-clawhub` consume, so the compiled output is never rebuilt after it has
+been verified. The release tag must equal `v<package.json version>` or the
+workflow fails before publishing.
 
 Running the workflow manually stops after `verify` and publishes nothing.
 
-Both registries require a repository secret: `CLAWHUB_TOKEN` and `NPM_TOKEN`.
-npm releases carry [provenance](https://docs.npmjs.com/generating-provenance-statements)
-attestations, so `NPM_TOKEN` must permit publishing to the `@serpapi` scope.
+Publishing requires the `CLAWHUB_TOKEN` repository secret.
 
 Publish manually only as a fallback:
 
@@ -104,9 +97,6 @@ clawhub login
 clawhub package validate .
 clawhub package publish . --family code-plugin --owner serpapi --dry-run
 clawhub package publish . --family code-plugin --owner serpapi
-
-npm publish --access public --dry-run
-npm publish --access public
 ```
 
 The `serpapi` organization is created once, by a maintainer, with:
