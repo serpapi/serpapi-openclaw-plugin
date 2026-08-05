@@ -82,9 +82,11 @@ jobs:
         run: pnpm run build
 
       - name: Pack the release tarball
-        # The tarball is only used to verify the exact files ClawHub receives;
-        # the compiled output is never rebuilt after this point.
-        run: npm pack
+        # The tarball is only used to verify the exact files ClawHub receives,
+        # so it is packed the same way ClawHub packs: `--ignore-scripts`, so a
+        # future prepare/prepack script cannot make the two diverge. The
+        # compiled output is never rebuilt after this point.
+        run: npm pack --ignore-scripts
 
       - name: Upload the release tarball
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
