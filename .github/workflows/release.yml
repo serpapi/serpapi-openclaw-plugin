@@ -82,9 +82,11 @@ jobs:
         run: pnpm run build
 
       - name: Pack the release tarball
-        # Both registries publish this exact tarball, so the compiled output is
-        # never rebuilt after this point.
-        run: npm pack
+        # The tarball is only used to verify the exact files ClawHub receives,
+        # so it is packed the same way ClawHub packs: `--ignore-scripts`, so a
+        # future prepare/prepack script cannot make the two diverge. The
+        # compiled output is never rebuilt after this point.
+        run: npm pack --ignore-scripts
 
       - name: Upload the release tarball
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -97,7 +99,7 @@ jobs:
       - name: Upload the compiled output
         # ClawHub packs a working directory rather than a tarball, so it needs
         # `dist/` on disk. Reusing this artifact keeps it byte-identical to the
-        # tarball published to npm.
+        # verified tarball.
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: compiled-output
@@ -159,59 +161,12 @@ jobs:
 
       - name: ClawHub validate the packed contents
         # Validate the extracted tarball rather than the repository, so the
-        # check runs against the exact files both registries receive.
+        # check runs against the exact files ClawHub receives.
         shell: bash
         run: |
           mkdir -p "${RUNNER_TEMP}/packed"
           tar -xzf artifact/*.tgz -C "${RUNNER_TEMP}/packed"
           clawhub package validate "${RUNNER_TEMP}/packed/package"
-
-  publish-npm:
-    name: Publish to npm
-    # `workflow_dispatch` stops after `verify`: publishing must always come from
-    # a published release so the checked-out ref is the release tag.
-    if: github.event_name == 'release'
-    needs: verify
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      # Required for npm provenance attestations.
-      id-token: write
-    environment:
-      name: release
-      url: https://www.npmjs.com/package/@serpapi/openclaw-plugin
-
-    steps:
-      - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 24
-          registry-url: https://registry.npmjs.org
-
-      - name: Download the verified tarball
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
-        with:
-          name: release-tarball
-          path: artifact/
-
-      - name: Verify the npm token is present
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          if [ -z "$NPM_TOKEN" ]; then
-            echo "::error::NPM_TOKEN secret is required to publish."
-            exit 1
-          fi
-
-      - name: npm publish (dry run)
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish artifact/*.tgz --access public --provenance --dry-run
-
-      - name: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish artifact/*.tgz --access public --provenance
 
   publish-clawhub:
     name: Publish to ClawHub

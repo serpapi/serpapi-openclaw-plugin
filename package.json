@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/serpapi/serpapi-openclaw-plugin#readme",
   "type": "module",
+  "private": true,
   "packageManager": "pnpm@10.33.1",
   "engines": {
     "node": ">=22.19.0"
@@ -34,7 +35,6 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "rm -rf dist",
-    "prepublishOnly": "pnpm run clean && pnpm run build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "biome ci .",
     "format": "biome check --write ."
@@ -54,7 +54,6 @@
     ],
     "install": {
       "clawhubSpec": "clawhub:@serpapi/openclaw-plugin",
-      "npmSpec": "@serpapi/openclaw-plugin",
       "defaultChoice": "clawhub",
       "minHostVersion": ">=2026.6.11"
     },
@@ -67,8 +66,7 @@
       "pluginSdkVersion": "2026.6.11"
     },
     "release": {
-      "publishToClawHub": true,
-      "publishToNpm": true
+      "publishToClawHub": true
     }
   }
 }
