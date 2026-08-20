@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
+import { readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
+import { readOutputArg, resolveToolConfig, type SerpApiToolCtx, serpApiResult } from "../utils.js";
 
 const ALLOWED_PARAMS = ["q", "gl", "hl", "location", "lrad", "uds", "next_page_token", "zero_trace"] as const;
 
@@ -43,6 +43,11 @@ export function createSerpApiJobsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
           description: "Filter string from filters[].parameters.uds in a previous response.",
         },
         next_page_token: { type: "string", description: "Token for next page of results." },
+        output: {
+          type: "string",
+          enum: ["md", "json"],
+          description: "Response format: 'md' (markdown, default, fewer tokens) or 'json' (structured).",
+        },
       },
       required: ["query"],
       additionalProperties: false,
@@ -61,9 +66,13 @@ export function createSerpApiJobsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
           uds: readStringParam(args, "uds") ?? undefined,
           next_page_token: readStringParam(args, "next_page_token") ?? undefined,
         },
+        output: readOutputArg(args),
         signal,
       });
-      return jsonResult(extract(raw, count));
+      return serpApiResult(typeof raw === "string" ? raw : extract(raw, count), {
+        markdownHeading: "Jobs Results",
+        limit: count,
+      });
     },
   };
 }

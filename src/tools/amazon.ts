@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
+import { readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
+import { readOutputArg, resolveToolConfig, type SerpApiToolCtx, serpApiResult } from "../utils.js";
 
 const ALLOWED_PARAMS = ["k", "amazon_domain", "language", "s", "node", "rh", "page", "zero_trace"] as const;
 
@@ -60,6 +60,11 @@ export function createSerpApiAmazonTool(api: OpenClawPluginApi, ctx?: SerpApiToo
           description: "Page number for pagination (default: 1).",
           minimum: 1,
         },
+        output: {
+          type: "string",
+          enum: ["md", "json"],
+          description: "Response format: 'md' (markdown, default, fewer tokens) or 'json' (structured).",
+        },
       },
       required: ["query"],
       additionalProperties: false,
@@ -79,9 +84,10 @@ export function createSerpApiAmazonTool(api: OpenClawPluginApi, ctx?: SerpApiToo
           rh: readStringParam(args, "rh") ?? undefined,
           page: readNumberParam(args, "page", { integer: true }) ?? 1,
         },
+        output: readOutputArg(args),
         signal,
       });
-      return jsonResult(extract(raw));
+      return serpApiResult(typeof raw === "string" ? raw : extract(raw));
     },
   };
 }

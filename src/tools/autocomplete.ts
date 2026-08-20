@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
+import { readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
+import { readOutputArg, resolveToolConfig, type SerpApiToolCtx, serpApiResult } from "../utils.js";
 
 const ALLOWED_PARAMS = ["q", "gl", "hl", "cp", "client", "zero_trace"] as const;
 
@@ -46,6 +46,11 @@ export function createSerpApiAutocompleteTool(api: OpenClawPluginApi, ctx?: Serp
           type: "string",
           description: "Autocomplete client (e.g. chrome, safari, firefox-b-d, youtube). Affects suggestion style.",
         },
+        output: {
+          type: "string",
+          enum: ["md", "json"],
+          description: "Response format: 'md' (markdown, default, fewer tokens) or 'json' (structured).",
+        },
       },
       required: ["query"],
       additionalProperties: false,
@@ -63,9 +68,10 @@ export function createSerpApiAutocompleteTool(api: OpenClawPluginApi, ctx?: Serp
           cp: readNumberParam(args, "cp", { integer: true }) ?? undefined,
           client: readStringParam(args, "client") ?? undefined,
         },
+        output: readOutputArg(args),
         signal,
       });
-      return jsonResult(extract(raw));
+      return serpApiResult(typeof raw === "string" ? raw : extract(raw));
     },
   };
 }

@@ -45,7 +45,7 @@ Set the API key via config or the `SERPAPI_API_KEY` environment variable:
     entries: {
       serpapi: {
         enabled: true,
-        config: { webSearch: { apiKey: "YOUR_SERPAPI_KEY", hl: "en" } },
+        config: { webSearch: { apiKey: "YOUR_SERPAPI_KEY", hl: "en", format: "md" } },
       },
     },
   },
@@ -57,6 +57,26 @@ export SERPAPI_API_KEY="YOUR_SERPAPI_KEY"
 ```
 
 Get a key at [serpapi.com/users/sign_up](https://serpapi.com/users/sign_up).
+
+### Response format
+
+> **Breaking change in 0.2.0** — the specialized `serpapi_*` tools now return
+> markdown by default.
+
+`format` controls how the specialized `serpapi_*` tools return results:
+
+- **`"md"` (default)** — SerpApi's markdown rendering, optimized for LLMs.
+  Results are returned under a single `markdown` field wrapped in
+  untrusted-content security markers, with the results table truncated to the
+  requested `count`.
+- **`"json"`** — the previous structured JSON responses, useful when you need
+  to process specific fields programmatically.
+
+Every specialized tool also accepts a per-call `output` argument (`"md"` or
+`"json"`) that overrides the configured default.
+
+The `web_search` provider always uses JSON: its contract (`results[]`,
+`count`/`maxResults`) is structured, so markdown does not apply to it.
 
 ## Develop
 

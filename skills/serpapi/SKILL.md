@@ -21,7 +21,8 @@ plugin must also be enabled via `plugins.entries.serpapi.enabled`:
         "config": {
           "webSearch": {
             "apiKey": "your-serpapi-key",
-            "hl": "en"
+            "hl": "en",
+            "format": "md"
           }
         }
       }
@@ -31,6 +32,22 @@ plugin must also be enabled via `plugins.entries.serpapi.enabled`:
 ```
 
 `apiKey` can also be provided via the `SERPAPI_API_KEY` environment variable. `hl` defaults to `en`.
+
+## Response format (breaking change in 0.2.0)
+
+`format` selects the default response format for all `serpapi_*` tools:
+
+- `"md"` (default) — SerpApi's LLM-optimized markdown. Tool results are
+  returned under a single `markdown` field wrapped in untrusted-content
+  security markers, with the results table truncated to `count` where the
+  tool supports it.
+- `"json"` — the structured JSON responses documented per tool below.
+
+Each tool also accepts a per-call `output` argument (`"md"` or `"json"`) to
+override the configured default.
+
+The `web_search` provider always uses JSON; the markdown format applies only
+to the specialized tools.
 
 ## When to use which tool
 

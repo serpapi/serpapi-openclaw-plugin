@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
+import { readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
+import { readOutputArg, resolveToolConfig, type SerpApiToolCtx, serpApiResult } from "../utils.js";
 
 const ALLOWED_PARAMS = ["q", "gl", "hl", "ll", "location", "z", "type", "nearby", "start", "zero_trace"] as const;
 
@@ -53,6 +53,11 @@ export function createSerpApiMapsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
           description: "Force results near this location. Recommended when query contains 'near me'.",
         },
         start: { type: "number", description: "Result offset for pagination (0, 20, 40...)." },
+        output: {
+          type: "string",
+          enum: ["md", "json"],
+          description: "Response format: 'md' (markdown, default, fewer tokens) or 'json' (structured).",
+        },
       },
       required: ["query"],
       additionalProperties: false,
@@ -82,9 +87,13 @@ export function createSerpApiMapsTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
           nearby: readStringParam(args, "nearby") ?? undefined,
           start: readNumberParam(args, "start", { integer: true }) ?? undefined,
         },
+        output: readOutputArg(args),
         signal,
       });
-      return jsonResult(extract(raw, count));
+      return serpApiResult(typeof raw === "string" ? raw : extract(raw, count), {
+        markdownHeading: "Local Results",
+        limit: count,
+      });
     },
   };
 }
