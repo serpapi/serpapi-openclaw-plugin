@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import { jsonResult, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
+import { readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
+import { readOutputArg, resolveToolConfig, type SerpApiToolCtx, serpApiResult } from "../utils.js";
 
 const ALLOWED_PARAMS = ["product_id", "ebay_domain", "locale", "lang", "shipping_country", "zero_trace"] as const;
 
@@ -46,6 +46,11 @@ export function createSerpApiEbayProductTool(api: OpenClawPluginApi, ctx?: SerpA
           type: "string",
           description: "Country code for shipping cost calculation (e.g. US, GB, DE).",
         },
+        output: {
+          type: "string",
+          enum: ["md", "json"],
+          description: "Response format: 'md' (markdown, default, fewer tokens) or 'json' (structured).",
+        },
       },
       required: ["product_id"],
       additionalProperties: false,
@@ -63,9 +68,10 @@ export function createSerpApiEbayProductTool(api: OpenClawPluginApi, ctx?: SerpA
           lang: readStringParam(args, "lang") ?? undefined,
           shipping_country: readStringParam(args, "shipping_country") ?? undefined,
         },
+        output: readOutputArg(args),
         signal,
       });
-      return jsonResult(extract(raw));
+      return serpApiResult(typeof raw === "string" ? raw : extract(raw));
     },
   };
 }

@@ -124,10 +124,12 @@ export function createSerpApiWebSearchProvider(): WebSearchProviderPlugin {
             safe: readStringParam(args, "safe") ?? undefined,
             start: readNumberParam(args, "start", { integer: true }) ?? undefined,
           },
+          // web_search's contract (results[], count) is structured; md applies to the specialized tools.
+          output: "json",
           signal: context?.signal,
           timeoutSeconds: resolveSearchTimeoutSeconds(ctx.searchConfig),
         });
-        return extract(raw, count);
+        return extract(raw as Record<string, unknown>, count);
       },
     }),
   };

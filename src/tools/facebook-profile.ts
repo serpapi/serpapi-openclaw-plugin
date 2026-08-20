@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import { jsonResult, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
+import { readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
+import { readOutputArg, resolveToolConfig, type SerpApiToolCtx, serpApiResult } from "../utils.js";
 
 const ALLOWED_PARAMS = ["profile_id", "zero_trace"] as const;
 
@@ -33,6 +33,11 @@ export function createSerpApiFacebookProfileTool(api: OpenClawPluginApi, ctx?: S
             "Facebook profile ID or slug from the profile URL. " +
             "E.g. 'Meta' from facebook.com/Meta, or '100080376596424' from facebook.com/profile.php?id=100080376596424.",
         },
+        output: {
+          type: "string",
+          enum: ["md", "json"],
+          description: "Response format: 'md' (markdown, default, fewer tokens) or 'json' (structured).",
+        },
       },
       required: ["profile_id"],
       additionalProperties: false,
@@ -46,9 +51,10 @@ export function createSerpApiFacebookProfileTool(api: OpenClawPluginApi, ctx?: S
         params: {
           profile_id: readStringParam(args, "profile_id", { required: true }),
         },
+        output: readOutputArg(args),
         signal,
       });
-      return jsonResult(extract(raw));
+      return serpApiResult(typeof raw === "string" ? raw : extract(raw));
     },
   };
 }

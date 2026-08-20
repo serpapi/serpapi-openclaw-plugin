@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import { jsonResult, readNumberParam, readStringParam, wrapWebContent } from "openclaw/plugin-sdk/provider-web-search";
+import { readNumberParam, readStringParam, wrapWebContent } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
+import { readOutputArg, resolveToolConfig, type SerpApiToolCtx, serpApiResult } from "../utils.js";
 
 const ALLOWED_PARAMS = ["q", "cc", "mkt", "location", "safeSearch", "filters", "first", "zero_trace"] as const;
 
@@ -57,6 +57,11 @@ export function createSerpApiBingTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
           description: "Result offset for pagination (default: 1; use 11 for page 2, 21 for page 3, ...).",
           minimum: 1,
         },
+        output: {
+          type: "string",
+          enum: ["md", "json"],
+          description: "Response format: 'md' (markdown, default, fewer tokens) or 'json' (structured).",
+        },
       },
       required: ["query"],
       additionalProperties: false,
@@ -80,9 +85,10 @@ export function createSerpApiBingTool(api: OpenClawPluginApi, ctx?: SerpApiToolC
           safeSearch: readStringParam(args, "safeSearch") ?? "Moderate",
           first: readNumberParam(args, "first", { integer: true }) ?? 1,
         },
+        output: readOutputArg(args),
         signal,
       });
-      return jsonResult(extract(raw));
+      return serpApiResult(typeof raw === "string" ? raw : extract(raw));
     },
   };
 }

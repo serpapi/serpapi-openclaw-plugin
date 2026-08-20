@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import { jsonResult, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
+import { readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
+import { readOutputArg, resolveToolConfig, type SerpApiToolCtx, serpApiResult } from "../utils.js";
 
 const ALLOWED_PARAMS = ["product_id", "store_id", "zero_trace"] as const;
 
@@ -34,6 +34,11 @@ export function createSerpApiWalmartProductTool(api: OpenClawPluginApi, ctx?: Se
           type: "string",
           description: "Store ID to get pricing for a specific Walmart store location.",
         },
+        output: {
+          type: "string",
+          enum: ["md", "json"],
+          description: "Response format: 'md' (markdown, default, fewer tokens) or 'json' (structured).",
+        },
       },
       required: ["product_id"],
       additionalProperties: false,
@@ -48,9 +53,10 @@ export function createSerpApiWalmartProductTool(api: OpenClawPluginApi, ctx?: Se
           product_id: readStringParam(args, "product_id", { required: true }),
           store_id: readStringParam(args, "store_id") ?? undefined,
         },
+        output: readOutputArg(args),
         signal,
       });
-      return jsonResult(extract(raw));
+      return serpApiResult(typeof raw === "string" ? raw : extract(raw));
     },
   };
 }

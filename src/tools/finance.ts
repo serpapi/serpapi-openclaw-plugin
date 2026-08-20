@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import { jsonResult, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
+import { readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
+import { readOutputArg, resolveToolConfig, type SerpApiToolCtx, serpApiResult } from "../utils.js";
 
 const ALLOWED_PARAMS = ["q", "hl", "window", "zero_trace"] as const;
 
@@ -42,6 +42,11 @@ export function createSerpApiFinanceTool(api: OpenClawPluginApi, ctx?: SerpApiTo
           type: "string",
           description: "Time window (default: 1D). Options: 1D, 5D, 1M, 6M, YTD, 1Y, 5Y, MAX.",
         },
+        output: {
+          type: "string",
+          enum: ["md", "json"],
+          description: "Response format: 'md' (markdown, default, fewer tokens) or 'json' (structured).",
+        },
       },
       required: ["query"],
       additionalProperties: false,
@@ -56,9 +61,10 @@ export function createSerpApiFinanceTool(api: OpenClawPluginApi, ctx?: SerpApiTo
           q: readStringParam(args, "query", { required: true }),
           window: readStringParam(args, "window") ?? "1D",
         },
+        output: readOutputArg(args),
         signal,
       });
-      return jsonResult(extract(raw));
+      return serpApiResult(typeof raw === "string" ? raw : extract(raw));
     },
   };
 }

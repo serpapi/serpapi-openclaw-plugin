@@ -12,9 +12,12 @@ export const SERPAPI_DEFAULT_TIMEOUT_SECONDS = 30;
 // Slightly under SerpApi's 1-hour server-side cache window so we refresh before it expires.
 export const SERPAPI_CACHE_TTL_MS = 55 * 60_000;
 
+export type SerpApiOutputFormat = "md" | "json";
+
 type SerpApiConfig = {
   apiKey?: unknown;
   hl?: unknown;
+  format?: unknown;
 };
 
 export function resolveSerpApiPluginConfig(cfg?: OpenClawConfig): SerpApiConfig | undefined {
@@ -33,4 +36,17 @@ export function resolveSerpApiKey(cfg?: OpenClawConfig): string | undefined {
 export function resolveSerpApiLanguage(cfg?: OpenClawConfig): string {
   const pluginConfig = resolveSerpApiPluginConfig(cfg);
   return normalizeOptionalString(pluginConfig?.hl)?.trim() || "en";
+}
+
+/** Invalid values throw instead of silently falling back. */
+export function resolveSerpApiFormat(cfg?: OpenClawConfig): SerpApiOutputFormat {
+  const pluginConfig = resolveSerpApiPluginConfig(cfg);
+  const format = normalizeOptionalString(pluginConfig?.format)?.trim().toLowerCase();
+  if (format === undefined) {
+    return "md";
+  }
+  if (format === "md" || format === "json") {
+    return format;
+  }
+  throw new Error(`serpapi: invalid webSearch.format "${format}". Expected "md" or "json".`);
 }

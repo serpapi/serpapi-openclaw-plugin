@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import { jsonResult, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
+import { readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
+import { readOutputArg, resolveToolConfig, type SerpApiToolCtx, serpApiResult } from "../utils.js";
 
 const ALLOWED_PARAMS = [
   "asin",
@@ -65,6 +65,11 @@ export function createSerpApiAmazonProductTool(api: OpenClawPluginApi, ctx?: Ser
           type: "string",
           description: "Country to filter shipping products by.",
         },
+        output: {
+          type: "string",
+          enum: ["md", "json"],
+          description: "Response format: 'md' (markdown, default, fewer tokens) or 'json' (structured).",
+        },
       },
       required: ["asin"],
       additionalProperties: false,
@@ -82,9 +87,10 @@ export function createSerpApiAmazonProductTool(api: OpenClawPluginApi, ctx?: Ser
           delivery_zip: readStringParam(args, "delivery_zip") ?? undefined,
           shipping_location: readStringParam(args, "shipping_location") ?? undefined,
         },
+        output: readOutputArg(args),
         signal,
       });
-      return jsonResult(extract(raw));
+      return serpApiResult(typeof raw === "string" ? raw : extract(raw));
     },
   };
 }

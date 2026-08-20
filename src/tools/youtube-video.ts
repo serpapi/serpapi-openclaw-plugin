@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import { jsonResult, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
+import { readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
+import { readOutputArg, resolveToolConfig, type SerpApiToolCtx, serpApiResult } from "../utils.js";
 
 const ALLOWED_PARAMS = ["v", "gl", "hl", "next_page_token", "zero_trace"] as const;
 
@@ -55,6 +55,11 @@ export function createSerpApiYouTubeVideoTool(api: OpenClawPluginApi, ctx?: Serp
             "Pagination token for related videos, comments, or replies. " +
             "Use related_videos_next_page_token, comments_next_page_token, comments_sorting_token[].token, or replies_next_page_token from a previous response.",
         },
+        output: {
+          type: "string",
+          enum: ["md", "json"],
+          description: "Response format: 'md' (markdown, default, fewer tokens) or 'json' (structured).",
+        },
       },
       required: ["v"],
       additionalProperties: false,
@@ -71,9 +76,10 @@ export function createSerpApiYouTubeVideoTool(api: OpenClawPluginApi, ctx?: Serp
           gl: readStringParam(args, "gl") ?? undefined,
           next_page_token: readStringParam(args, "next_page_token") ?? undefined,
         },
+        output: readOutputArg(args),
         signal,
       });
-      return jsonResult(extract(raw));
+      return serpApiResult(typeof raw === "string" ? raw : extract(raw));
     },
   };
 }

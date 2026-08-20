@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
+import { readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
+import { readOutputArg, resolveToolConfig, type SerpApiToolCtx, serpApiResult } from "../utils.js";
 
 const ALLOWED_PARAMS = [
   "query",
@@ -78,6 +78,11 @@ export function createSerpApiWalmartTool(api: OpenClawPluginApi, ctx?: SerpApiTo
           minimum: 1,
           maximum: 100,
         },
+        output: {
+          type: "string",
+          enum: ["md", "json"],
+          description: "Response format: 'md' (markdown, default, fewer tokens) or 'json' (structured).",
+        },
       },
       required: [],
       additionalProperties: false,
@@ -104,9 +109,10 @@ export function createSerpApiWalmartTool(api: OpenClawPluginApi, ctx?: SerpApiTo
           max_price: readNumberParam(args, "max_price") ?? undefined,
           page: readNumberParam(args, "page", { integer: true }) ?? 1,
         },
+        output: readOutputArg(args),
         signal,
       });
-      return jsonResult(extract(raw));
+      return serpApiResult(typeof raw === "string" ? raw : extract(raw));
     },
   };
 }

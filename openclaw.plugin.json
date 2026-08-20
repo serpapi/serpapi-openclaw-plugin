@@ -25,6 +25,10 @@
     "webSearch.hl": {
       "label": "Default Language",
       "help": "Default language code for all searches (e.g. en, de, uk). Defaults to en."
+    },
+    "webSearch.format": {
+      "label": "Response Format",
+      "help": "Response format for all SerpApi requests: 'md' (markdown, default, fewer LLM tokens) or 'json' (structured)."
     }
   },
   "contracts": {
@@ -76,6 +80,12 @@
           "hl": {
             "type": "string",
             "description": "Default language code for all searches (e.g. en, de, ja). Defaults to en."
+          },
+          "format": {
+            "type": "string",
+            "enum": ["md", "json"],
+            "default": "md",
+            "description": "Response format: 'md' returns SerpApi's LLM-optimized markdown (default, fewer tokens); 'json' returns structured JSON."
           }
         }
       }

@@ -1,8 +1,8 @@
 import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
-import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
+import { readNumberParam, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
 import { callSerpApi } from "../serpapi-client.js";
-import { resolveToolConfig, type SerpApiToolCtx } from "../utils.js";
+import { readOutputArg, resolveToolConfig, type SerpApiToolCtx, serpApiResult } from "../utils.js";
 
 const ALLOWED_PARAMS = ["q", "lat", "lon", "tripadvisor_domain", "ssrc", "offset", "limit", "zero_trace"] as const;
 
@@ -60,6 +60,11 @@ export function createSerpApiTripadvisorTool(api: OpenClawPluginApi, ctx?: SerpA
           description: "Result offset for pagination (default: 0; use 30 for page 2, 60 for page 3, ...).",
           minimum: 0,
         },
+        output: {
+          type: "string",
+          enum: ["md", "json"],
+          description: "Response format: 'md' (markdown, default, fewer tokens) or 'json' (structured).",
+        },
       },
       required: ["query"],
       additionalProperties: false,
@@ -79,9 +84,10 @@ export function createSerpApiTripadvisorTool(api: OpenClawPluginApi, ctx?: SerpA
           limit: readNumberParam(args, "limit", { integer: true }) ?? 30,
           offset: readNumberParam(args, "offset", { integer: true }) ?? undefined,
         },
+        output: readOutputArg(args),
         signal,
       });
-      return jsonResult(extract(raw));
+      return serpApiResult(typeof raw === "string" ? raw : extract(raw));
     },
   };
 }
